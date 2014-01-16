@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin{
@@ -63,13 +62,17 @@ public class Main extends JavaPlugin{
 		
 		if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
 
+		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate already exists, please choose a different name.");	
+			
 		}else{      		
 		
 		File crate = new File(getDataFolder() + "/data", args[1] + ".yml");
 		try {
 			crate.createNewFile();
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been created, please use /crate edit to edit it's contents.");
 		} catch (IOException e) {
 			e.printStackTrace();
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] CRATE CREATION FAILED, PLEASE CHECK CONSOLE FOR AN ERROR!");
 		}
 		
 		}

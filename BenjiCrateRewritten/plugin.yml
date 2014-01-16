@@ -1,0 +1,12 @@
+name: BenjiCrate
+author: benjibobs
+version: Alpha-0.1
+main: com.github.benjibobsmc.BenjiCrateRewritten.Main
+prefix: BenjiCrate
+commands:
+  bcrate:
+    default: op
+permissions:
+  bcrate.use:
+    default: op
+    description: Allows basic use of the plugin
