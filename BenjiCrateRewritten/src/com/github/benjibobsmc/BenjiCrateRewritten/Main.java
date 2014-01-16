@@ -9,16 +9,22 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin{
 
 	Logger log = Logger.getLogger("Minecraft");
 	public static boolean fopen = false;
+	public final MainListener lis = new MainListener(this);
 	
 	@Override
 	public void onEnable() {
-
+		
+		PluginManager pm = getServer().getPluginManager();
+		
+		pm.registerEvents(lis, this);
+		
 		File folder = new File(getDataFolder(), "data");
 	    if(new File(getDataFolder(), "data") == null || !new File(getDataFolder(), "data").exists()){
 			
