@@ -19,6 +19,23 @@ public class Main extends JavaPlugin{
 	@Override
 	public void onEnable() {
 
+		File folder = new File(getDataFolder(), "data");
+	    if(new File(getDataFolder(), "data") == null || !new File(getDataFolder(), "data").exists()){
+			
+			folder.mkdirs();
+			
+		}
+	    
+	    File dummy = new File(folder, "PLACEHOLDER" + ".donotdelete");
+		if(!dummy.exists()){
+			try {
+				dummy.createNewFile();
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+		}
+		
 		log.info("BenjiCrate v" + this.getDescription().getVersion() + " has been enabled.");
 		
 	}
