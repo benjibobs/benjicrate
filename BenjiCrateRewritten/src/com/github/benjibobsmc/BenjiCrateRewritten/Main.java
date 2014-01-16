@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin{
@@ -45,6 +46,9 @@ public class Main extends JavaPlugin{
 	        case "create":
 	          doCrateCreate(upi, args);
 	          break;
+	        case "edit":
+		          doCrateEdit(upi, args);
+		          break;
 	        default:
 	          DoCommandHelp();
 	        }
@@ -58,7 +62,7 @@ public class Main extends JavaPlugin{
 	public void doCrateCreate(Player upi, String[] args){
 		if(args.length != 2){
 			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
-		}
+		}else{
 		
 		if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
 
@@ -68,6 +72,7 @@ public class Main extends JavaPlugin{
 		
 		File crate = new File(getDataFolder() + "/data", args[1] + ".yml");
 		try {
+			fopen = true;
 			crate.createNewFile();
 			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been created, please use /crate edit to edit it's contents.");
 		} catch (IOException e) {
@@ -77,6 +82,7 @@ public class Main extends JavaPlugin{
 		
 		}
 		
+		}
 		
 	}
 	
@@ -84,6 +90,21 @@ public class Main extends JavaPlugin{
 		
 		
 		
+	}
+	
+	public void doCrateEdit(Player upi, String[] args){
+		if(args.length != 2){
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
+		}else{
+			if(fopen == true){
+		
+			fopen = false;
+			Inventory inv = getServer().createInventory(upi, 3*9, "Currently editing '" + args[1] + "'");
+			upi.openInventory(inv);
+		}else{
+			
+		}
+		}
 	}
 	
 }
