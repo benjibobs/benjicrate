@@ -22,7 +22,7 @@ public class Main extends JavaPlugin{
 
 	Logger log = Logger.getLogger("Minecraft");
 	public static boolean fopen = false;
-	public final MainListener lis = new MainListener(this);
+	public final MainListener lis = new MainListener(this, getConfig());
 	
 	@Override
 	public void onEnable() {
