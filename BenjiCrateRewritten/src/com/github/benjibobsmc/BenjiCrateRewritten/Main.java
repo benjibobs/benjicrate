@@ -1,7 +1,10 @@
 package com.github.benjibobsmc.BenjiCrateRewritten;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -9,8 +12,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 
 public class Main extends JavaPlugin{
 
@@ -61,7 +67,7 @@ public class Main extends JavaPlugin{
 			
 			if(!(sender instanceof Player)){
 				sender.sendMessage("You must be a player to use this right now, sorry.");
-			}else{
+			}else if(args.length != 0){
 			
 			Player upi = (Player)sender;
 			
@@ -76,6 +82,10 @@ public class Main extends JavaPlugin{
 	          DoCommandHelp();
 	        }
 			
+			}else{
+				
+				DoCommandHelp();
+				
 			}
 		}
 		
@@ -118,7 +128,7 @@ public class Main extends JavaPlugin{
 	public void doCrateEdit(Player upi, String[] args){
 		if(args.length != 2){
 			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
-		}else{
+		}else if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
 			if(fopen == true){
 		
 			fopen = false;
@@ -126,8 +136,100 @@ public class Main extends JavaPlugin{
 			upi.openInventory(inv);
 		}else{
 			
+			Inventory inv = getServer().createInventory(upi, 3*9, "Currently editing '" + args[1] + "'");
+			inv.setContents(loadInventory(args[1]));
+			upi.openInventory(inv);
+			
 		}
+		}else{
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate does not exist.");
 		}
 	}
+	
+	public void doCrateRemove(Player upi, String[] args){
+		if(args.length !=2){
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
+		}else if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
+			
+			removeInventory(args[1]);
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been removed successfully!");
+			
+		}else{
+			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate does not exist.");
+		}
+	}
+	
+	public ItemStack[] loadInventory(String name)
+    {
+    	File folder = new File(this.getDataFolder(), "data");
+    	if(!folder.exists())
+    	{
+    		folder.mkdirs();
+    		return null;
+    	}
+
+    	String fileName = name + ".yml";
+    	File file = new File(folder, fileName);
+    	
+    	if(!file.exists())
+    		return null;
+    	
+    	FileInputStream fis = null;
+    	Yaml yaml = new Yaml(new CustomClassLoaderConstructor(getClass().getClassLoader()));
+    	ArrayList<SerializableItemStack> sItems = null;
+
+		try 
+		{
+			fis = new FileInputStream(file);
+			sItems = (ArrayList<SerializableItemStack>)yaml.load(fis);
+			fis.close();
+		} 
+		catch (Exception e) 
+		{
+			if(fis != null)
+			{
+				try {
+					fis.close();
+				} catch (IOException e1) {
+					this.getLogger().log(Level.WARNING, e.getMessage());
+				}
+			}
+			this.getLogger().log(Level.WARNING, e.getMessage());
+		}
+    
+		if(sItems != null)
+		{
+			ItemStack[] retval = new ItemStack[sItems.size()];
+			for(int i=0; i<sItems.size(); i++)
+			{
+				if(sItems.get(i) == null)
+					retval[i] = null;
+				else
+					retval[i] = sItems.get(i).getItemStack();
+			}
+			return retval;
+		}
+		
+    	return null;
+    }
+	
+	public void removeInventory(String name)
+    {
+    	File folder = new File(this.getDataFolder(), "data");
+    	if(!folder.exists())
+    	{
+    		folder.mkdirs();
+    		return;
+    	}
+
+    	String fileName = name + ".yml";
+    	File file = new File(folder, fileName);
+    	
+    	if(!file.exists())
+    		return;
+
+    	file.delete();
+    	
+    }
 	
 }

@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -27,6 +29,8 @@ public class MainListener implements Listener{
 		  if(event.getInventory().getName().indexOf("Currently editing '") != -1){
 			  ItemStack[] items = event.getInventory().getContents();
 			  saveInventory(items, event.getInventory().getName().replace("Currently ", "").replace("editing '", "").replace("'", ""));
+			  Player player = (Player)event.getPlayer();
+			  player.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + event.getInventory().getName().replace("Currently ", "").replace("editing '", "").replace("'", "") + "' has been edited successfully");
 		  }
 		  
 	  }
