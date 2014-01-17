@@ -25,6 +25,7 @@ public class MainListener implements Listener{
 	  public void invSaveHandling(InventoryCloseEvent event){
 		  
 		  if(event.getInventory().getName().indexOf("Currently editing '") != -1){
+			  ItemStack[] items = event.getInventory().getContents();
 			  saveInventory(items, event.getInventory().getName().replace("Currently ", "").replace("editing '", "").replace("'", ""));
 		  }
 		  
@@ -56,7 +57,7 @@ public class MainListener implements Listener{
 			} 
 			catch (Exception e) 
 			{
-				Plugin.getLogger().log(Level.WARNING, e.getMessage());
+				plugin.getLogger().log(Level.WARNING, e.getMessage());
 			}
 
 	    }
