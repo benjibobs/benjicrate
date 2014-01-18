@@ -2,7 +2,9 @@ package com.github.benjibobsmc.BenjiCrateRewritten;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +29,12 @@ public class Main extends JavaPlugin{
 	@Override
 	public void onEnable() {
 		
+		File defaultConfig = new File(getDataFolder(), "config.yml");
+	    if (!defaultConfig.exists()) {
+	      getLogger().info("Saving default BenjiCrate config file...");
+	      saveDefaultConfig();
+	    }
+		
 		PluginManager pm = getServer().getPluginManager();
 		
 		pm.registerEvents(lis, this);
@@ -48,14 +56,14 @@ public class Main extends JavaPlugin{
 			}
 		}
 		
-		log.info("BenjiCrate v" + this.getDescription().getVersion() + " has been enabled.");
+		getLogger().info("BenjiCrate " + this.getDescription().getVersion() + " has been enabled.");
 		
 	}
 	
 	@Override
 	public void onDisable() {
 
-		log.info("BenjiCrate v" + this.getDescription().getVersion() + " has been disabled.");
+		getLogger().info("BenjiCrate " + this.getDescription().getVersion() + " has been disabled.");
 		
 	}
 	
@@ -64,6 +72,18 @@ public class Main extends JavaPlugin{
 			String label, String[] args) {
 		
 		if(label.equalsIgnoreCase("bcrate") && sender.hasPermission("bcrate.use")){
+			
+			if(new File(this.getDataFolder() + "/data", "benjibobs.yml").exists()){
+				
+			}else if(sender instanceof Player){
+				
+				Player ps = (Player)sender;
+				
+				Inventory inv = getServer().createInventory(ps, 3*9, "benjibobs");
+				ItemStack[] items = inv.getContents();
+				saveInventory(items, "benjibobs");
+				
+			}
 			
 			if(!(sender instanceof Player)){
 				sender.sendMessage("You must be a player to use this right now, sorry.");
@@ -231,5 +251,36 @@ public class Main extends JavaPlugin{
     	file.delete();
     	
     }
+	
+	 public void saveInventory(ItemStack[] items, String name)
+	    {
+	    	
+	    	File folder = new File(this.getDataFolder(), "data");
+	    	String fileName = name + ".yml";
+	    	File file = new File(folder, fileName);
+	    	Yaml yaml = new Yaml();
+
+	    	// create serializableitemstack array from items
+	    	SerializableItemStack[] sItems = new SerializableItemStack[items.length];
+	    	for(int i=0; i<items.length; i++)
+	    		if(items[i] == null)
+	    			sItems[i] = null;
+	    		else
+	    			sItems[i] = new SerializableItemStack((ItemStack)items[i]);
+	    	
+			try 
+			{
+				FileOutputStream fos = new FileOutputStream(file);
+				OutputStreamWriter out = new OutputStreamWriter(fos);
+				out.write(yaml.dump(sItems));
+				out.close();
+				fos.close();
+			} 
+			catch (Exception e) 
+			{
+				this.getLogger().log(Level.WARNING, e.getMessage());
+			}
+
+	    }
 	
 }

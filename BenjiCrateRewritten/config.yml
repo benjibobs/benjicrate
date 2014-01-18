@@ -1,0 +1,12 @@
+crates:
+  benjibobs:
+    block: true
+    id: 1
+    data: 0
+    has-custom-name: true
+    name: '&4&lbenjibobs'
+    has-custom-lore: true
+    lore: '&4&lTEST!'
+    bind: true
+    drop: true
+    drop-chance: 100
