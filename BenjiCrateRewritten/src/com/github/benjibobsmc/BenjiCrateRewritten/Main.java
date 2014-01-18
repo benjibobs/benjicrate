@@ -139,7 +139,6 @@ public class Main extends JavaPlugin{
 		getConfig().createSection("crates." + args[1]);
 		getConfig().set("crates." + args[1] + ".id", 35);
 		getConfig().set("crates." + args[1] + ".data", 6);
-		getConfig().set("crates." + args[1] + ".has-custom-name", false);
 		getConfig().set("crates." + args[1] + ".name", "'namehere'");
 		getConfig().set("crates." + args[1] + ".has-custom-lore", false);
 		getConfig().set("crates." + args[1] + ".lore", "'lorehere'");
@@ -197,7 +196,6 @@ public class Main extends JavaPlugin{
 	}
 	
 	public void doCrateReload(Player upi){
-		saveConfig();
 		reloadConfig();
 		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Configuration reloaded!");
 	}
