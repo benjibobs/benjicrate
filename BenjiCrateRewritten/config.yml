@@ -1,6 +1,5 @@
 crates:
   benjibobs:
-    block: true
     id: 1
     data: 0
     has-custom-name: true

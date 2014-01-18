@@ -93,11 +93,19 @@ public class Main extends JavaPlugin{
 			
 			switch (args[0].toLowerCase()) {
 	        case "create":
-	          doCrateCreate(upi, args);
+				try {
+					doCrateCreate(upi, args);
+				} catch (IOException e) {
+					
+					e.printStackTrace();
+				}
 	          break;
 	        case "edit":
 		          doCrateEdit(upi, args);
 		          break;
+	        case "reload":
+	        	  doCrateReload(upi);
+	        	  break;
 	        default:
 	          DoCommandHelp();
 	        }
@@ -112,7 +120,7 @@ public class Main extends JavaPlugin{
 		return false;
 	}
 	
-	public void doCrateCreate(Player upi, String[] args){
+	public void doCrateCreate(Player upi, String[] args) throws IOException{
 		if(args.length != 2){
 			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
 		}else{
@@ -124,14 +132,23 @@ public class Main extends JavaPlugin{
 		}else{      		
 		
 		File crate = new File(getDataFolder() + "/data", args[1] + ".yml");
-		try {
-			fopen = true;
-			crate.createNewFile();
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been created, please use /crate edit to edit it's contents.");
-		} catch (IOException e) {
-			e.printStackTrace();
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] CRATE CREATION FAILED, PLEASE CHECK CONSOLE FOR AN ERROR!");
-		}
+		fopen = true;
+		Inventory inv = getServer().createInventory(upi, 3*9);
+		ItemStack[] items = inv.getContents();
+		saveInventory(items, args[1]);
+		getConfig().createSection("crates." + args[1]);
+		getConfig().set("crates." + args[1] + ".id", 35);
+		getConfig().set("crates." + args[1] + ".data", 6);
+		getConfig().set("crates." + args[1] + ".has-custom-name", false);
+		getConfig().set("crates." + args[1] + ".name", "'namehere'");
+		getConfig().set("crates." + args[1] + ".has-custom-lore", false);
+		getConfig().set("crates." + args[1] + ".lore", "'lorehere'");
+		getConfig().set("crates." + args[1] + ".bind", true);
+		getConfig().set("crates." + args[1] + ".drop", true);
+		getConfig().set("crates." + args[1] + ".drop-chance", 100);
+		saveConfig();
+		reloadConfig();
+		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been created, please use /crate edit to edit it's contents.");
 		
 		}
 		
@@ -177,6 +194,12 @@ public class Main extends JavaPlugin{
 		}else{
 			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate does not exist.");
 		}
+	}
+	
+	public void doCrateReload(Player upi){
+		saveConfig();
+		reloadConfig();
+		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Configuration reloaded!");
 	}
 	
 	public ItemStack[] loadInventory(String name)
