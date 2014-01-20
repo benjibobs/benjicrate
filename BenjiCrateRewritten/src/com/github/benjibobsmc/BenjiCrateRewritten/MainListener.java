@@ -11,6 +11,9 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Level;
 
+import net.minecraft.server.v1_7_R1.EntitySpider;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -18,12 +21,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor;
 
@@ -47,7 +54,7 @@ public class MainListener implements Listener{
 			  ItemStack[] items = event.getInventory().getContents();
 			  saveInventory(items, event.getInventory().getName().replace("Currently ", "").replace("editing '", "").replace("'", ""));
 			  Player player = (Player)event.getPlayer();
-			  player.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + event.getInventory().getName().replace("Currently ", "").replace("editing '", "").replace("'", "") + "' has been edited successfully");
+			  player.sendMessage(ChatColor.GOLD + "[BenjiCrate] The crate '" + event.getInventory().getName().replace("Currently ", "").replace("editing '", "").replace("'", "") + "' has been edited successfully");
 		  }
 		  
 	  }
@@ -112,26 +119,33 @@ public class MainListener implements Listener{
 	            		drop = new ItemStack(config.getInt("crates." + cratename + ".id"), 1, (short)config.getInt("crates." + cratename + ".data"));
 	            		meta = drop.getItemMeta();
 	            		
-	            		meta.setDisplayName(config.getString("crates." + cratename + ".name").replace("&1", ChatColor.DARK_BLUE + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "));
+	            		meta.setDisplayName(config.getString("crates." + cratename + ".name").replace("&1", ChatColor.GOLD + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "));
 	            		
 	            		if(config.getBoolean("crates." + cratename + ".has-custom-lore") == true){
 	            		List<String> lore = new ArrayList<String>();
-	            		lore.add(config.getString("crates." + cratename + ".lore").replace("&1", ChatColor.DARK_BLUE + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "));
+	            		lore.add(config.getString("crates." + cratename + ".lore").replace("&1", ChatColor.GOLD + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "));
 	            		meta.setLore(lore);	
 	            		}
-	            		
+	            		if(meta.getLore() != null){
 	            		List<String> lore = meta.getLore();
 	            		
 	            		lore.add(ChatColor.GOLD + "Crate");
 	            		
 	            		meta.setLore(lore);
-	            		
+	            		}else{
+	            		List<String> lore = new ArrayList<String>();
+		            		
+		            	lore.add(ChatColor.GOLD + "Crate");
+		            		
+		            	meta.setLore(lore);
+	            		}
 	            		drop.setItemMeta(meta);
 	            
 	            
-	            		
+	            		if(event.getEntity().getMetadata("isSpawnNatural").get(0).asBoolean() == true){
 	            		event.getEntity().getWorld().dropItemNaturally(event.getEntity().getLocation(), drop);
 	            		
+	            		}
 	            	
 	    		}
 	            			
@@ -149,31 +163,27 @@ public class MainListener implements Listener{
 		  for (Iterator i$ = this.config.getConfigurationSection("crates").getKeys(false).iterator(); i$.hasNext(); ) { 
 		    	String cratename = (String)i$.next();
 		      
-		    	if(event.getItem().getTypeId() == config.getInt("crates." + cratename + ".id") && event.getItem().getDurability() == config.getInt("crates." + cratename + ".data")){
-		    		if(event.getItem().getItemMeta().getDisplayName().equals(config.getString("crates." + cratename + ".name").replace("&1", ChatColor.DARK_BLUE + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "))){
-		    			if(config.getBoolean("crates." + cratename + ".use-custom-lore") == true){
+		    	if(event.getItem() != null && event.getItem().getTypeId() == config.getInt("crates." + cratename + ".id") && event.getItem().getDurability() == config.getInt("crates." + cratename + ".data")){
+		    		if(event.getItem().getItemMeta().getDisplayName().equals(config.getString("crates." + cratename + ".name").replace("&1", ChatColor.GOLD + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "))){
+		    			if(!event.getPlayer().hasPermission("bcrate.use." + cratename.toLowerCase())){
+		    				event.getPlayer().sendMessage(ChatColor.GOLD + "[BenjiCrate] You do not have permission to use this crate!");
+		    			}else{
 		    				if(config.getBoolean("crates." + cratename + ".bind") == true){
-		    					if(event.getItem().getItemMeta().getLore().contains(event.getPlayer().getName())){
+		    					if(event.getItem().getItemMeta().getLore().contains(ChatColor.RED + "" + event.getPlayer().getName())){
 		    						event.setCancelled(true);
 		    						Inventory inv = plugin.getServer().createInventory(event.getPlayer(), 3*9, cratename);
 		    						inv.setContents(loadInventory(cratename));
 		    						event.getPlayer().openInventory(inv);
 		    						event.getPlayer().getInventory().remove(event.getItem());
 		    					}
-		    				}else if(event.getItem().getItemMeta().getLore().contains(config.getString("crates." + cratename + "lore").replace("&1", ChatColor.DARK_BLUE + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "))){
-		    					event.setCancelled(true);
-		    					Inventory inv = plugin.getServer().createInventory(event.getPlayer(), 3*9, cratename);
-	    						inv.setContents(loadInventory(cratename));
-	    						event.getPlayer().openInventory(inv);
-	    						event.getPlayer().getInventory().remove(event.getItem());
-		    				}
-		    			}else if(event.getItem().getItemMeta().getLore().contains(ChatColor.GOLD + "Crate")){
+		    				}else if(event.getItem().getItemMeta().getLore().contains(ChatColor.GOLD + "Crate")){
 		    				event.setCancelled(true);
 		    				Inventory inv = plugin.getServer().createInventory(event.getPlayer(), 3*9, cratename);
     						inv.setContents(loadInventory(cratename));
     						event.getPlayer().openInventory(inv);
     						event.getPlayer().getInventory().remove(event.getItem());
 		    			}
+		    		}
 		    		}
 		    	}
 		            		
@@ -244,5 +254,59 @@ public class MainListener implements Listener{
 	    	return null;
 	    }
 	  
+	  @EventHandler
+	  public void bindCrate(PlayerPickupItemEvent event){
+		  
+		  for (Iterator i$ = this.config.getConfigurationSection("crates").getKeys(false).iterator(); i$.hasNext(); ) { 
+		    	String cratename = (String)i$.next();
+		      
+		    	if(event.getItem().getItemStack().getTypeId() == config.getInt("crates." + cratename + ".id") && event.getItem().getItemStack().getDurability() == config.getInt("crates." + cratename + ".data")){
+		    		if(event.getItem().getItemStack().getItemMeta().getDisplayName().equals(config.getString("crates." + cratename + ".name").replace("&1", ChatColor.GOLD + "").replace("&2", ChatColor.DARK_GREEN + "").replace("&3", ChatColor.DARK_AQUA + "").replace("&4", ChatColor.DARK_RED + "").replace("&5", ChatColor.DARK_PURPLE + "").replace("&6", ChatColor.GOLD + "").replace("&7", ChatColor.GRAY + "").replace("&8", ChatColor.DARK_GRAY + "").replace("&9", ChatColor.BLUE + "").replace("&0", ChatColor.BLACK + "").replace("&c", ChatColor.RED + "").replace("&e", ChatColor.YELLOW + "").replace("&a", ChatColor.GREEN + "").replace("&b", ChatColor.AQUA + "").replace("&d", ChatColor.LIGHT_PURPLE + "").replace("&f", ChatColor.WHITE + "").replace("&l", ChatColor.BOLD + "").replace("&r", ChatColor.RESET + "").replace("&k", ChatColor.MAGIC + "").replace("&n", ChatColor.UNDERLINE + "").replace("&o", ChatColor.ITALIC + "").replace("&m", ChatColor.STRIKETHROUGH + "").replace("_", " "))){
+		    			
+		    				
+		    				if(event.getItem().getItemStack().getItemMeta().getLore() != null && event.getItem().getItemStack().getItemMeta().getLore().contains(ChatColor.GOLD + "Crate")){
+		    					
+		    					if(config.getBoolean("crates." + cratename + ".bind") == true){
+			    					if(event.getItem().getItemStack().getItemMeta().getLore().contains(ChatColor.RED + "" + event.getPlayer().getName())){
+
+			    					}else{
+			    						List<String> lore = event.getItem().getItemStack().getItemMeta().getLore();
+			    						ItemMeta meta = event.getItem().getItemStack().getItemMeta();
+			    						lore.add(ChatColor.RED + "" + event.getPlayer().getName());
+			    						meta.setLore(lore);
+			    						event.getItem().getItemStack().setItemMeta(meta);
+			    					}
+		    					
+		    				}
+		    					}
+		    			}
+		    		}
+		    	}
+		            		
+		            		
+		            		
+		            
+		    	
+		    	
+		    		
+		            			
+		          }
+	  		
 	  
-}
+	  
+	  		@EventHandler
+	  		public void metaAdd(CreatureSpawnEvent event){
+	  			
+	  			if(event.getSpawnReason().equals(SpawnReason.NATURAL)){
+	  				event.getEntity().setMetadata("isSpawnNatural", new FixedMetadataValue(plugin.getPlugin(Main.class), true));
+	  			}else{
+	  				event.getEntity().setMetadata("isSpawnNatural", new FixedMetadataValue(plugin.getPlugin(Main.class), false));
+	  			}
+	  			
+	  			
+	  		}
+	
+		  
+	  }
+	  
+

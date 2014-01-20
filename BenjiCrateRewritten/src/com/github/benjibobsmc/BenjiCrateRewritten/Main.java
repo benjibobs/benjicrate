@@ -71,7 +71,7 @@ public class Main extends JavaPlugin{
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 		
-		if(label.equalsIgnoreCase("bcrate") && sender.hasPermission("bcrate.use")){
+		if(label.equalsIgnoreCase("bcrate") && sender.hasPermission("bcrate.admin")){
 			
 			if(new File(this.getDataFolder() + "/data", "benjibobs.yml").exists()){
 				
@@ -106,6 +106,9 @@ public class Main extends JavaPlugin{
 	        case "reload":
 	        	  doCrateReload(upi);
 	        	  break;
+	        case "remove":
+	        	doCrateRemove(upi, args);
+	        	break;
 	        default:
 	          DoCommandHelp();
 	        }
@@ -122,12 +125,12 @@ public class Main extends JavaPlugin{
 	
 	public void doCrateCreate(Player upi, String[] args) throws IOException{
 		if(args.length != 2){
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
+			upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Insufficent arguements!");
 		}else{
 		
 		if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
 
-		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate already exists, please choose a different name.");	
+		upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Crate already exists, please choose a different name.");	
 			
 		}else{      		
 		
@@ -139,15 +142,15 @@ public class Main extends JavaPlugin{
 		getConfig().createSection("crates." + args[1]);
 		getConfig().set("crates." + args[1] + ".id", 35);
 		getConfig().set("crates." + args[1] + ".data", 6);
-		getConfig().set("crates." + args[1] + ".name", "'namehere'");
+		getConfig().set("crates." + args[1] + ".name", "'namehere - remove the two extra apostrophes at the start!");
 		getConfig().set("crates." + args[1] + ".has-custom-lore", false);
-		getConfig().set("crates." + args[1] + ".lore", "'lorehere'");
+		getConfig().set("crates." + args[1] + ".lore", "'lorehere' - remove the two extra apostrophes at the start!");
 		getConfig().set("crates." + args[1] + ".bind", true);
 		getConfig().set("crates." + args[1] + ".drop", true);
 		getConfig().set("crates." + args[1] + ".drop-chance", 100);
 		saveConfig();
 		reloadConfig();
-		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been created, please use /crate edit to edit it's contents.");
+		upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] The crate '" + args[1] + "' has been created, please use /crate edit to edit it's contents.");
 		
 		}
 		
@@ -163,7 +166,7 @@ public class Main extends JavaPlugin{
 	
 	public void doCrateEdit(Player upi, String[] args){
 		if(args.length != 2){
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
+			upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Insufficent arguements!");
 		}else if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
 			if(fopen == true){
 		
@@ -178,26 +181,40 @@ public class Main extends JavaPlugin{
 			
 		}
 		}else{
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate does not exist.");
+			upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Crate does not exist.");
 		}
 	}
 	
 	public void doCrateRemove(Player upi, String[] args){
 		if(args.length !=2){
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Insufficent arguements!");
+			upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Insufficent arguements!");
 		}else if(new File(getDataFolder() + "/data", args[1] + ".yml").exists()){
 			
+			
+			getConfig().set("crates." + args[1] + ".id", null);
+			getConfig().set("crates." + args[1] + ".data", null);
+			getConfig().set("crates." + args[1] + ".name", null);
+			getConfig().set("crates." + args[1] + ".has-custom-lore", null);
+			getConfig().set("crates." + args[1] + ".lore", null);
+			getConfig().set("crates." + args[1] + ".bind", null);
+			getConfig().set("crates." + args[1] + ".drop", null);
+			getConfig().set("crates." + args[1] + ".drop-chance", null);
+			getConfig().set("crates" + args[1], null);
+			saveConfig();
+			reloadConfig();
+			
 			removeInventory(args[1]);
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] The crate '" + args[1] + "' has been removed successfully!");
+			upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] The crate '" + args[1] + "' has been removed successfully!");
 			
 		}else{
-			upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Crate does not exist.");
+			upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Crate does not exist.");
 		}
 	}
 	
 	public void doCrateReload(Player upi){
+		saveConfig();
 		reloadConfig();
-		upi.sendMessage(ChatColor.DARK_BLUE + "[BenjiCrate] Configuration reloaded!");
+		upi.sendMessage(ChatColor.GOLD + "[BenjiCrate] Configuration reloaded!");
 	}
 	
 	public ItemStack[] loadInventory(String name)
